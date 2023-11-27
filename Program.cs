@@ -4,7 +4,7 @@
     {
         Name = "Football",
         Price = 15.00M,
-        StockDate = new DateTime(2022, 10, 20),
+        StockDate = new DateTime(2023, 11, 24),
         ManufactureYear = 2010,
         Condition = 4.2
     },
@@ -12,7 +12,7 @@
     {
         Name = "Hockey Stick",
         Price = 12.20M,
-        StockDate = new DateTime(2000, 11, 21),
+        StockDate = new DateTime(2023, 11, 24),
         ManufactureYear = 1999,
         Condition = 3.9
     },
@@ -20,7 +20,7 @@
     {
         Name = "Basketball",
         Price = 15.00M,
-        StockDate = new DateTime(2001, 12, 22),
+        StockDate = new DateTime(2023, 11, 24),
         ManufactureYear = 2000,
         Condition = 4.1
     },
@@ -28,7 +28,7 @@
     {
         Name = "Hoop",
         Price = 50.00M,
-        StockDate = new DateTime(2002, 1, 23),
+        StockDate = new DateTime(2023, 11, 24),
         ManufactureYear = 2001,
         Condition = 3.4
     },
@@ -36,7 +36,7 @@
     {
         Name = "Mountain Bike",
         Price = 199.00M,
-        StockDate = new DateTime(2003, 2, 24),
+        StockDate = new DateTime(2023, 11, 24),
         ManufactureYear = 2002,
         Condition = 4.8
     },
@@ -44,7 +44,7 @@
     {
         Name = "Electric Jeep",
         Price = 349.00M,
-        StockDate = new DateTime(2004, 3, 25),
+        StockDate = new DateTime(2023, 11, 24),
         ManufactureYear = 2003,
         Condition = 3.1
     },
@@ -52,7 +52,8 @@
     {
         Name = "Electric Scooter",
         Price = 179.00M,
-        StockDate = new DateTime(2005, 4, 26),
+        SoldOnDate = new DateTime(2023, 11, 26),
+        StockDate = new DateTime(2023, 11, 24),
         ManufactureYear = 2004,
         Condition = 3.8
     },
@@ -78,6 +79,7 @@
     {
         Name = "Hunting Hat",
         Price = 6.99M,
+        SoldOnDate = new DateTime(2023, 11, 26),
         StockDate = new DateTime(2023, 11, 14),
         ManufactureYear = 2022,
         Condition = 4.2
@@ -100,7 +102,9 @@ while (choice != "0")
     3. View latest products
     4. monthly sales report
     5. add a product
-    6. buy a product");
+    6. buy a product
+    7. average time stocked
+    8. average time sold");
 
     choice = Console.ReadLine();
 
@@ -131,6 +135,14 @@ while (choice != "0")
     else if (choice == "6")
     {
         BuyProduct();
+    }
+    else if (choice == "7")
+    {
+        AverageTimeStocked();
+    }
+    else if (choice == "8")
+    {
+        AverageTimeSold();
     }
 }
 
@@ -163,14 +175,23 @@ void ViewProductDetails()
             Console.WriteLine("Do better!");
         }
     }
-
-    // DateTime now = DateTime.Now;
-
-    // TimeSpan timeInStock = now - chosenProduct.StockDate;
     Console.WriteLine(@$"You chose: {chosenProduct.Name}, which costs {chosenProduct.Price} dollars.
     It is {DateTime.Now.Year - chosenProduct.ManufactureYear} years old.
-    It {(chosenProduct.SoldOnDate == null ? "is not available" : $"has been in stock for {chosenProduct.TimeInStock.Days} days.")}
+    It {(chosenProduct.SoldOnDate != null ? "is not available" : $"has been in stock for {chosenProduct.TimeInStock.Days} days.")}
     The item's condition rating is {chosenProduct.Condition} out of 5.");
+    if (chosenProduct.SoldOnDate == null)
+    {
+        Console.WriteLine("would you like to buy the product? yes or no?");
+        string response = Console.ReadLine().Trim();
+        if (response == "yes")
+        {
+            chosenProduct.SoldOnDate = DateTime.Now;
+        }
+        else
+        {
+            Console.WriteLine("returning to main menu...");
+        }
+    }
 }
 
 void ListProducts()
@@ -312,3 +333,21 @@ void BuyProduct()
         { Console.WriteLine("wrong format"); }
     }
 }
+
+void AverageTimeStocked()
+{
+    // Allow the user to see the average time that currently stocked products have been on the shelf (in days).
+    List<Product> unsoldProducts = products.Where((product) => product.SoldOnDate == null).ToList();
+    TimeSpan averageDays = TimeSpan.Zero;
+    unsoldProducts.ForEach((product) => averageDays += product.TimeInStock);
+    Console.WriteLine($"average shelf time of products in stock is... {averageDays.Days / unsoldProducts.Count} days");
+}
+
+void AverageTimeSold()
+{
+    List<Product> soldProducts = products.Where((product) => product.SoldOnDate != null).ToList();
+    TimeSpan timeSpan = TimeSpan.Zero;
+    soldProducts.ForEach((product) => timeSpan += product.TimeInStock);
+    Console.WriteLine($"average time on shelf before products were sold... {timeSpan.Days / soldProducts.Count} days");
+}
+// come back and add the hours challenge
