@@ -99,7 +99,8 @@ while (choice != "0")
     2. View product details
     3. View latest products
     4. monthly sales report
-    5. add a product");
+    5. add a product
+    6. buy a product");
 
     choice = Console.ReadLine();
 
@@ -126,6 +127,10 @@ while (choice != "0")
     else if (choice == "5")
     {
         AddProduct();
+    }
+    else if (choice == "6")
+    {
+        BuyProduct();
     }
 }
 
@@ -171,6 +176,7 @@ void ViewProductDetails()
 void ListProducts()
 {
     decimal totalValue = 0.0M;
+    Console.WriteLine($"Total inventory value: ${totalValue}");
     foreach (Product product in products)
     {
         if (product.SoldOnDate == null)
@@ -178,7 +184,6 @@ void ListProducts()
             totalValue += product.Price;
         }
     }
-    Console.WriteLine($"Total inventory value: ${totalValue}");
     Console.WriteLine("Products:");
     for (int i = 0; i < products.Count; i++)
     {
@@ -285,4 +290,25 @@ void AddProduct()
     Console.WriteLine($"given condition is ... {newProduct.Condition}");
 
     products.Add(newProduct);
+}
+// this needs to be updated
+void BuyProduct()
+{
+    List<Product> unsoldList = products.Where((product) => product.SoldOnDate == null).ToList();
+    for (int i = 0; i < unsoldList.Count; i++)
+    {
+        Console.WriteLine($"{i + 1}. {unsoldList[i].Name}");
+    }
+    Product chosenProduct = null;
+    while (chosenProduct == null)
+    {
+        try
+        {
+            chosenProduct = unsoldList[int.Parse(Console.ReadLine().Trim()) - 1];
+            chosenProduct.SoldOnDate = DateTime.Now;
+            Console.WriteLine($"you bought... {chosenProduct.Name}");
+        }
+        catch (FormatException)
+        { Console.WriteLine("wrong format"); }
+    }
 }
